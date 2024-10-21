@@ -1,0 +1,36 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+url = "https://saras.cbse.gov.in/SARAS/AffiliatedList/ListOfSchdirReport"
+
+response = requests.get(url)
+soup = BeautifulSoup(response.content, 'html.parser')
+
+data = []
+table = soup.find('table') 
+rows = table.find_all('tr')[1:]
+
+for row in rows:
+    cols = row.find_all('td')
+    if len(cols) >=5:
+        aff_no = cols[0].text.strip()
+        state_district = cols[1].text.strip()
+        status = cols[2].text.strip()
+        school = cols[3].text.strip()
+        head_name = cols[4].text.strip()
+        data.append([aff_no, state_district, status, school, head_name])
+        
+
+df = pd.DataFrame(data, columns=['Aff No', 'State', 'Status', 'School', 'Head Name']) 
+
+
+
+total_count = df.shape[0]
+
+
+
+schools = df[df['Head Name'] == 'RAJESH KUMAR']['School'].tolist()
+
+
+
